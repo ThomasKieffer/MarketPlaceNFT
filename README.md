@@ -6,6 +6,9 @@ For now you can use this marketplace to buy or sell NFTs.
 
 I will soon add new features such as marketplace fees and an auction system.
 
+<li><a href="https://github.com/ThomasKieffer/MarketPlaceNFT/blob/master/contracts/MarketPlace.sol">MarketPlace contract</a></li>
+<li><a href="https://github.com/ThomasKieffer/MarketPlaceNFT/blob/master/test/MarketPlace.js">MarketPlace Units Tests</a></li>
+
 
 Try running some of the following tasks:
 
