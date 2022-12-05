@@ -8,7 +8,7 @@ async function main() {
   const MarketPlace = await ethers.getContractFactory("MarketPlace");
 
   const nft = await NFT.deploy();
-  const marketplace = await MarketPlace.deploy();
+  const marketplace = await MarketPlace.deploy(2);
 }
 
 main().catch((error) => {

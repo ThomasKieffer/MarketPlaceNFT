@@ -13,8 +13,8 @@ import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
 contract MarketPlace is Ownable, ReentrancyGuard {
 
     // will allow to transfer fees to the market contract
-    // To be implemented
-    uint256 private marketplaceFees;
+    // 2% on transactions
+    uint8 private _marketplaceFees;
 
     // Contain info of the NFT supported by the market
     // Can be extended to contain more informations
@@ -41,7 +41,9 @@ contract MarketPlace is Ownable, ReentrancyGuard {
         _;
     }
 
-    constructor() {}
+    constructor(uint8 marketFees ) {
+        _marketplaceFees = marketFees;
+    }
 
     /// @notice Allow the owner of a NFT token to put it for sell on the marketplace.
     /// @dev  The owner must set a price to put the NFT for sell.
@@ -61,7 +63,7 @@ contract MarketPlace is Ownable, ReentrancyGuard {
     /// @dev  The token is removed from sell by putting it's price to 0.
     /// @param nft The NFT collection of the token to be withdrawn from sale.
     /// @param nftId The Id of the NFT token to be withdrawn from sale.
-    function removePrice(IERC721 nft, uint256 nftId) public onlyNftOwner(nft, nftId) {
+    function removePrice(IERC721 nft, uint256 nftId) external onlyNftOwner(nft, nftId) {
         // require(nft.ownerOf(nftId) == msg.sender, "You are not the owner of this nft");
         require(NFTinfos[address(nft)][nftId].price > 0, "Price already at 0");
         NFTinfos[address(nft)][nftId] = NFTinfo (
@@ -81,8 +83,14 @@ contract MarketPlace is Ownable, ReentrancyGuard {
         require( msg.value >=  originalPrice, "Incorrect amount");
         address originalOwner = nft.ownerOf(nftId);
 
-        (bool success, ) = originalOwner.call{value: msg.value}("");
-        require(success, "Transfer failed.");
+        uint256 fees = (msg.value * _marketplaceFees)/100;
+        // //transfert 2% to marketplace
+        // (bool success, ) = payable(address(this)).call{value: fees}("");
+        // require(success, "Transfer failed.");
+        
+        //transfert the rest to the original owner
+        (bool success2, ) = originalOwner.call{value: msg.value-fees}("");
+        require(success2, "Transfer failed.");
 
         nft.safeTransferFrom(originalOwner, msg.sender, nftId);
         NFTinfos[address(nft)][nftId].price = 0;
